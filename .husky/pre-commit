@@ -1,0 +1,4 @@
+(cd server && yarn test) || exit 1
+
+
+npx lint-staged
