@@ -42,3 +42,22 @@ export interface GetAllCandidatesDataOptions {
   url: string;
   accumulatedData?: CandidatesData;
 }
+
+export interface FetchTeamtailorApiData {
+  data: Candidate[];
+  included?: JobApplication[];
+}
+
+export interface FilteredCandidate {
+  candidate_id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  job_application_id: string | null;
+  job_application_created_at: string | null;
+}
+
+export interface FetchPaginatedCandidatesReturn {
+  candidates: FilteredCandidate[];
+  meta: { pageCount: number; nextPage: string | undefined };
+}
