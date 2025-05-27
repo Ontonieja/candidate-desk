@@ -30,6 +30,17 @@ export default async function fetchAllPages(
 
     return updatedData;
   } catch (err) {
+    if (axios.isAxiosError(err) && err.response?.status === 429) {
+      const resetTime = parseInt(err.response.headers['x-rate-limit-reset']);
+      const delayTime = (resetTime + 1) * 1000;
+
+      console.log(`Rate limit hit. Waiting ${delayTime / 1000} seconds before retry...`);
+
+      await new Promise((resolve) => setTimeout(resolve, delayTime));
+
+      return fetchAllPages(options);
+    }
+
     throw err;
   }
 }
