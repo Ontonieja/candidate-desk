@@ -23,9 +23,7 @@ export default async function fetchAllPages(
       applications: [...accumulatedData.applications, ...(currentApplications || [])]
     };
 
-    if (nextPage) {
-      return fetchAllPages({ url: nextPage, accumulatedData: updatedData });
-    }
+    if (nextPage) return fetchAllPages({ url: nextPage, accumulatedData: updatedData });
 
     return updatedData;
   } catch (err) {
