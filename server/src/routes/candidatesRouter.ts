@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { exportCandidatesCsv, getCandidatesPage } from '../controllers/candidatesController';
+import { exportCandidatesCsv, getPaginatedCandidates } from '../controllers/candidatesController';
 
 const router = Router();
 
-router.get('/candidates', exportCandidatesCsv);
+router.get('/candidates', getPaginatedCandidates);
 
-router.get('/candidates/export/csv', getCandidatesPage);
+router.get('/candidates/export/csv', exportCandidatesCsv);
 
 export default router;
