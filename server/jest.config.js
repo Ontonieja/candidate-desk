@@ -7,5 +7,8 @@ module.exports = {
   testEnvironment: 'node',
   transform: {
     ...tsJestTransformCfg
+  },
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1'
   }
 };
