@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { exportCandidatesCsv, getPaginatedCandidates } from '../controllers/candidatesController';
+import { exportCandidatesCsv, getPaginatedCandidates } from '@/controllers/candidatesController';
 
 const router = Router();
 

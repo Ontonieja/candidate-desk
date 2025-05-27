@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import AppError from '../utils/appError';
+import AppError from '@/utils/appError';
 import axios from 'axios';
 
 function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {

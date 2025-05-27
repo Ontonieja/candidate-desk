@@ -21,10 +21,11 @@
     "nodemon": "^3.1.10",
     "supertest": "^7.1.1",
     "ts-jest": "^29.3.4",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0"
   },
   "scripts": {
-    "dev": "nodemon src/server/server.ts",
+    "dev": "nodemon -r tsconfig-paths/register src/server/server.ts",
     "test": "jest"
   }
 }
