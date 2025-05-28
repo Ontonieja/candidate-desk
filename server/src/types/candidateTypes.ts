@@ -61,8 +61,6 @@ export interface FetchPaginatedCandidatesReturn {
   candidates: FilteredCandidate[];
   meta: {
     pageCount: number;
-    nextPage: string | undefined;
     recordCount: number;
-    prevPage: string | undefined;
   };
 }
