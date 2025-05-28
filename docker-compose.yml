@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  # Node.js backend
+  server:
+    build:
+      context: ./server
+    container_name: node_server
+    ports:
+      - '3000:3000'
+    env_file:
+      - server/.env
+    command: ['yarn', 'dev']
+    working_dir: '/server'
+    volumes:
+      - ./server:/server
+      - /server/node_modules
+    networks:
+      - app-network
+
+  # React frontend
+  client:
+    build:
+      context: ./client
+    container_name: react_client
+    ports:
+      - '5173:5173'
+    depends_on:
+      - server
+    working_dir: '/client'
+    volumes:
+      - ./client:/client
+      - /client/node_modules
+    networks:
+      - app-network
+    command: ['yarn', 'dev', '--host']
+
+networks:
+  app-network:
+    driver: bridge
