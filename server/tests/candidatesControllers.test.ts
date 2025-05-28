@@ -12,6 +12,16 @@ jest.mock('@/services/candidatesServices', () => ({
       job_application_created_at: '2024-01-01'
     }
   ]),
+  getCachedCandidates: jest.fn(() => [
+    {
+      candidate_id: '1',
+      first_name: 'Jan',
+      last_name: 'Kowalski',
+      email: 'jan@ex.com',
+      job_application_id: 'a1',
+      job_application_created_at: '2024-01-01'
+    }
+  ]),
   fetchPaginatedCandidates: jest.fn(() => ({
     candidates: [
       {
@@ -38,13 +48,8 @@ describe('GET /api/candidates/export/csv', () => {
 
 describe('GET /api/candidates', () => {
   it('should return paginated candidates as JSON', async () => {
-    const res = await request(app).get('/api/v1/candidates?pageSize=10');
+    const res = await request(app).get('/api/v1/candidates?page=1&pageSize=10');
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('candidates');
-  });
-
-  it('should return 400 if pageSize is missing', async () => {
-    const res = await request(app).get('/api/v1/candidates');
-    expect(res.status).toBe(400);
   });
 });

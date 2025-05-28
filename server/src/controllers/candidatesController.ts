@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { fetchPaginatedCandidates, getAllCandidatesData } from '@/services/candidatesServices';
+import { fetchPaginatedCandidates, getCachedCandidates } from '@/services/candidatesServices';
 import AppError from '@/utils/appError';
 import { URL_WITH_JOB_APPLICATIONS } from '@/routes/endpoints';
 import { candidatesToCsv } from '@/utils/csvTransform';
@@ -10,7 +10,7 @@ export async function exportCandidatesCsv(
   next: NextFunction
 ): Promise<any> {
   try {
-    const candidates = await getAllCandidatesData();
+    const candidates = await getCachedCandidates();
 
     if (!candidates || !candidates.length) throw new AppError('No candidates received', 500);
 
@@ -31,16 +31,10 @@ export async function getPaginatedCandidates(
   next: NextFunction
 ): Promise<any> {
   try {
-    const { pageSize, url } = req.query;
+    const pageSize = parseInt(req.query.pageSize as string) || 10;
+    const page = parseInt(req.query.page as string) || 1;
 
-    if (!pageSize && !url) throw new AppError('Missing page size', 400);
-
-    const fetchUrl =
-      typeof url === 'string' && url.length > 0
-        ? url
-        : `${URL_WITH_JOB_APPLICATIONS}&page[size]=${pageSize}`;
-
-    const data = await fetchPaginatedCandidates(fetchUrl);
+    const data = await fetchPaginatedCandidates(page, pageSize);
 
     if (!data.candidates.length) throw new AppError('No candidates received', 500);
 
