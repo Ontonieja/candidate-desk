@@ -11,7 +11,7 @@ Choose your preferred setup method:
 #### 1. Clone the repository
 ```bash
 git clone https://github.com/Ontonieja/candidate-desk.git
-cd candidates-app
+cd candidates-desk
 ```
 
 #### 2. Set up environment variables
