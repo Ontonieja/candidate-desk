@@ -7,6 +7,7 @@ export interface TeamtailorApiResponse {
   links?: {
     self: string;
     next?: string;
+    prev?: string;
   };
   meta?: {
     'record-count': number;
