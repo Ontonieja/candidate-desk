@@ -22,7 +22,9 @@ export async function fetchPaginatedCandidates(
 
     const { data: candidatesData, included: applicationsData } = response;
     const pageCount = response.meta?.['page-count'] ?? 0;
+    const recordCount = response.meta?.['record-count'] ?? 0;
     const nextPage = response.links?.next;
+    const prevPage = response.links?.prev;
 
     const filteredCandidates = filterCandidates({
       candidates: candidatesData,
@@ -33,7 +35,9 @@ export async function fetchPaginatedCandidates(
       candidates: filteredCandidates,
       meta: {
         pageCount,
-        nextPage
+        recordCount,
+        nextPage,
+        prevPage
       }
     };
   } catch (err) {

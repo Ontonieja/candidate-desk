@@ -2,6 +2,7 @@
 
 @theme {
   --color-primary: #d7256d;
+  --color-primary-accent: #f43f84;
   --color-primary-muted: #fff0f5;
   --font-inter: 'Inter', sans-serif;
 }

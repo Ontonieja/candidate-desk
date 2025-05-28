@@ -33,9 +33,7 @@ export async function getPaginatedCandidates(
   try {
     const { pageSize, url } = req.query;
 
-    if (!pageSize) {
-      throw new AppError('Missing page size', 400);
-    }
+    if (!pageSize && !url) throw new AppError('Missing page size', 400);
 
     const fetchUrl =
       typeof url === 'string' && url.length > 0
