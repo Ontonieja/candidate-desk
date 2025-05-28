@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { FaArrowRight, FaArrowLeft } from 'react-icons/fa6';
 import columns from './columns';
 import { useCandidatesQueryOptions } from '../../queryOptions/candidatesQuery';
+import type { Candidate } from '../../types/candidatesTypes';
 
 export default function DataTableContainer() {
   const [pageSize, setPageSize] = useState(10);
@@ -28,36 +29,47 @@ export default function DataTableContainer() {
       setCurrentPage((prev) => prev - 1);
     }
   };
-  if (!data && isLoading) return;
+
+  const currentCandidates = data?.candidates ? data.candidates.slice(0, pageSize) : [];
 
   return (
-    <main className='mt-12'>
+    <main className='mt-8 md:mt-12 '>
       <div className='flex justify-between'>
-        <h2 className='text-2xl font-bold'>Candidates</h2>
-        <div className='gap-4 flex'>
+        <h2 className='text-2xl font-bold hidden md:block'>Candidates</h2>
+        <div className='gap-3 flex items-center w-full max-md:justify-between justify-end'>
           <div className='relative'>
             <input
               type='text'
-              className='border border-[#f0f0f0] px-8 focus:outline-none rounded-xl  py-2'
+              className='border border-[#f0f0f0] text-xs sm:text-sm  w-full px-8 focus:outline-none rounded-xl py-2 sm:w-full'
               placeholder='Search candidates'
             ></input>
             <IoIosSearch className='absolute top-1/2 left-3 -translate-y-1/2 size-4 text-gray-400' />
           </div>
-          <button
-            className='bg-primary-accent text-white px-4 py-2 rounded-lg flex gap-2 items-center cursor-pointer ease-in-out duration-300 hover:bg-primary'
-            onClick={() => {
-              window.open('http://localhost:3000/api/v1/candidates/export/csv', '_blank');
-            }}
-          >
-            <FaFileExport className='size-4' />
-            <p className='font-semibold'>Export candidates</p>
-          </button>
+          <div>
+            <button
+              className='bg-primary-accent text-white text-xs sm:text-sm px-4 py-2 rounded-lg flex gap-2 items-center cursor-pointer ease-in-out duration-300 hover:bg-primary'
+              onClick={() => {
+                window.open('http://localhost:3000/api/v1/candidates/export/csv', '_blank');
+              }}
+            >
+              <FaFileExport className='size-4' />
+              <p className='font-semibold whitespace-nowrap'>Export candidates</p>
+            </button>
+          </div>
         </div>
       </div>
-      <div className='w-full overflow-x-auto rounded-3xl text-xs bg-[#fbfbfb] mt-4 p-2'>
-        <DataTable columns={columns} data={data.candidates} />
+      <div className='w-full rounded-3xl text-xs bg-[#fbfbfb] mt-4 p-2'>
+        <div className='w-full'>
+          <DataTable
+            columns={columns}
+            data={currentCandidates as Candidate[]}
+            loading={isLoading}
+            pageSize={pageSize}
+          />
+        </div>
       </div>
-      <div className='flex justify-between text-xs px-4 mt-4 text-gray-700 font-medium'>
+
+      <div className='flex justify-between text-xs md:px-4 mt-4 text-gray-700 font-medium'>
         <div className='flex  items-center'>
           <select
             value={pageSize}
@@ -74,10 +86,14 @@ export default function DataTableContainer() {
               </option>
             ))}
           </select>
+
           <p>
-            {pageSize * (currentPage - 1)} - {pageSize * currentPage} of {data.meta.recordCount}
+            {data?.meta
+              ? `${pageSize * (currentPage - 1) + 1} - ${Math.min(pageSize * currentPage, data.meta.recordCount)} of ${data.meta.recordCount}`
+              : '...'}
           </p>
         </div>
+
         <div className='flex gap-4 items-center'>
           {data?.meta?.prevPage && !isFetching && (
             <button
@@ -88,7 +104,7 @@ export default function DataTableContainer() {
               <FaArrowLeft className='size-4' />
             </button>
           )}
-          {currentPage} of {data.meta.pageCount}
+          <span>{data?.meta ? `${currentPage} of ${data.meta.pageCount}` : '...'}</span>
           <button
             onClick={handleNext}
             disabled={!data?.meta?.nextPage || isFetching}
