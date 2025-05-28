@@ -4,12 +4,17 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import errorHandler from './middlewares/errorHandler';
 import candidatesRoutes from './routes/candidatesRouter';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app: Express = express();
 const httpServer = createServer(app);
 
+const { CLIENT_URL } = process.env;
+
 const corsOptions = {
-  origin: process.env.CLIENT_URL,
+  origin: CLIENT_URL,
   credentials: true
 };
 
