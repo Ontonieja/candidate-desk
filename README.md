@@ -10,7 +10,7 @@ Choose your preferred setup method:
 
 #### 1. Clone the repository
 ```bash
-git clone https://github.com/Ontonieja/candidate-desk.git
+git clone https://github.com/Ontonieja/candidates-desk.git
 cd candidates-desk
 ```
 
