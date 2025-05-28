@@ -1,43 +1,47 @@
-import {
-  CandidatesData,
-  FetchPaginatedCandidatesReturn,
-  FilteredCandidate
-} from '@/types/candidateTypes';
+import { FetchPaginatedCandidatesReturn, FilteredCandidate } from '@/types/candidateTypes';
 import fetchAllPages from '@/utils/fetchAllPages';
-import fetchTeamtailorApi from '@/utils/fetchTeamtailorApi';
 import filterCandidates from '@/utils/filterCandidates';
 import { GET_ALL_CANDIDATES_URL } from '@/routes/endpoints';
+import AppError from '@/utils/appError';
+import candidateCache from '@/constants/candidateCache';
 
-export async function getAllCandidatesData(): Promise<FilteredCandidate[]> {
-  const candidates = await fetchAllPages({ url: GET_ALL_CANDIDATES_URL });
+export async function getCachedCandidates(): Promise<FilteredCandidate[]> {
+  const now = Date.now();
 
-  return filterCandidates(candidates);
+  const { data, lastFetch, TTL: CACHE_TTL } = candidateCache;
+
+  if (!data.length || now - lastFetch > CACHE_TTL) {
+    try {
+      const candidates = await fetchAllPages({ url: GET_ALL_CANDIDATES_URL });
+      candidateCache.data = filterCandidates(candidates);
+      candidateCache.lastFetch = now;
+
+      return candidateCache.data;
+    } catch (err) {
+      throw new AppError(`Failed to fetch and cache candidates`, 500);
+    }
+  }
+  return data;
 }
 
 export async function fetchPaginatedCandidates(
-  url: string
+  page: number,
+  pageSize: number
 ): Promise<FetchPaginatedCandidatesReturn> {
   try {
-    const response = await fetchTeamtailorApi(url);
+    const allCandidates = await getCachedCandidates();
 
-    const { data: candidatesData, included: applicationsData } = response;
-    const pageCount = response.meta?.['page-count'] ?? 0;
-    const recordCount = response.meta?.['record-count'] ?? 0;
-    const nextPage = response.links?.next;
-    const prevPage = response.links?.prev;
+    if (!allCandidates.length) throw new AppError('No candidates found', 404);
 
-    const filteredCandidates = filterCandidates({
-      candidates: candidatesData,
-      applications: applicationsData ?? []
-    });
+    const startIndex = (page - 1) * pageSize;
+    const paginatedCandidates = allCandidates.slice(startIndex, startIndex + pageSize);
+    const totalPages = Math.ceil(allCandidates.length / pageSize);
 
     return {
-      candidates: filteredCandidates,
+      candidates: paginatedCandidates,
       meta: {
-        pageCount,
-        recordCount,
-        nextPage,
-        prevPage
+        pageCount: totalPages,
+        recordCount: allCandidates.length
       }
     };
   } catch (err) {
