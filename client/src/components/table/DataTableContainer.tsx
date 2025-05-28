@@ -11,35 +11,24 @@ import type { Candidate } from '../../types/candidatesTypes';
 export default function DataTableContainer() {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const [nextUrl, setNextUrl] = useState<string | null>(null);
   const [search, setSearch] = useState<string>('');
-
-  const queryOptions = useCandidatesQueryOptions(nextUrl, pageSize);
+  const queryOptions = useCandidatesQueryOptions(currentPage, pageSize);
   const { isLoading, data, isFetching } = useQuery(queryOptions);
-  const { prevPage, recordCount = 0, nextPage, pageCount = 0 } = data?.meta ?? {};
+  const { recordCount = 0, pageCount = 0 } = data?.meta ?? {};
   const candidates = data?.candidates;
 
-  const currentCandidates =
-    candidates && candidates.length > pageSize ? candidates.slice(0, pageSize) : candidates;
-
   const handleNext = () => {
-    if (nextPage) {
-      setNextUrl(nextPage);
-      setCurrentPage((prev) => prev + 1);
-    }
+    setCurrentPage((prev) => prev + 1);
   };
 
   const handlePrev = () => {
-    if (prevPage) {
-      setNextUrl(prevPage);
-      setCurrentPage((prev) => prev - 1);
-    }
+    setCurrentPage((prev) => prev - 1);
   };
 
   const filteredCandidates = useMemo(() => {
-    if (!search.trim()) return currentCandidates;
+    if (!search.trim()) return candidates;
 
-    return currentCandidates?.filter((candidate: Candidate) => {
+    return candidates?.filter((candidate: Candidate) => {
       const searchLower = search.toLowerCase();
       return [
         candidate.first_name,
@@ -51,7 +40,7 @@ export default function DataTableContainer() {
         .filter(Boolean)
         .some((field) => field.toLowerCase().includes(searchLower));
     });
-  }, [currentCandidates, search]);
+  }, [candidates, search]);
 
   return (
     <div className='mt-8 md:mt-12 '>
@@ -98,7 +87,6 @@ export default function DataTableContainer() {
             value={pageSize}
             onChange={(e) => {
               setPageSize(Number(e.target.value));
-              setNextUrl(null);
               setCurrentPage(1);
             }}
             className='border border-gray-200 rounded-xl py-2 px-3 mr-2 focus:outline-none appearance-none'
@@ -118,10 +106,10 @@ export default function DataTableContainer() {
         </div>
 
         <div className='flex gap-4 items-center'>
-          {prevPage && !isFetching && (
+          {currentPage > 1 && !isLoading && (
             <button
               onClick={handlePrev}
-              disabled={!prevPage || isFetching}
+              disabled={isFetching}
               className='cursor-pointer hover:text-primary-accent ease-in-out duration-300 bg-transparent border-none'
             >
               <FaArrowLeft className='size-4' />
@@ -131,7 +119,7 @@ export default function DataTableContainer() {
           {currentPage < pageCount && (
             <button
               onClick={handleNext}
-              disabled={!nextPage || isFetching}
+              disabled={isFetching}
               className='cursor-pointer hover:text-primary-accent ease-in-out duration-300 bg-transparent border-none'
             >
               <FaArrowRight className='size-4' />
