@@ -34,7 +34,7 @@ PORT=3000
 TEAMTAILOR_API_KEY=your_actual_api_key_here
 
 # Teamtailor API version
-TEAMTAILOR_API_VERSION=20161108
+TEAMTAILOR_API_VERSION=20240404
 
 # Frontend URL
 CLIENT_URL="http://localhost:5173"
@@ -53,18 +53,14 @@ CLIENT_URL="http://localhost:5173"
 
 #### 2. Clone and setup
 ```bash
-git clone https://github.com/Ontonieja/candidate-desk.git
-cd candidates-app
+git clone https://github.com/Ontonieja/candidates-desk.git
+cd candidates-desk
 
-# Setup backend
-cd server
-cp .env.example .env
-# Edit .env with your API key
-yarn install
+# Make the script executable (macOS/Linux)
+chmod +x install.sh
 
-# Setup frontend (in new terminal)
-cd ../client
-yarn install
+# Run the setup script. It will install packages for client and server and copy env based on .env.example. 
+./install.sh
 ```
 
 #### 3. Configure environment
@@ -73,19 +69,17 @@ Edit `server/.env`:
 ```env
 PORT=3000
 TEAMTAILOR_API_KEY=your_actual_api_key_here
-TEAMTAILOR_API_VERSION=20161108
+TEAMTAILOR_API_VERSION=20240404
 CLIENT_URL="http://localhost:5173"
 ```
 
 #### 4. Run locally
 ```bash
-# Terminal 1: Start backend
-cd server
-yarn dev
+# Make the script executable (macOS/Linux)
+chmod +x dev.sh
 
-# Terminal 2: Start frontend
-cd client
-yarn start
+# Run the dev script. It will start both backend and client servers.
+./dev.sh
 ```
 
 ## 🌐 Access the Application
@@ -97,16 +91,16 @@ yarn start
 
 ### Candidates
 - `GET /api/v1/candidates` - Get paginated candidates
-  - Query params: `pageSize`, `page`
+  - Query params: `pageSize`, `page`,`search`.
 - `GET /api/v1/candidates/export` - Export all candidates to CSV
 
 ### Example API Usage
 ```bash
 # Get first page with 10 candidates
-curl "http://localhost:3001/api/v1/candidates?pageSize=10&page=1"
+curl "http://localhost:3000/api/v1/candidates?pageSize=10&page=1&search=hugo"
 
 # Export CSV
-curl "http://localhost:3001/api/v1/candidates/export" -o candidates.csv
+curl "http://localhost:3000/api/v1/candidates/export" -o candidates.csv
 ```
 
 
