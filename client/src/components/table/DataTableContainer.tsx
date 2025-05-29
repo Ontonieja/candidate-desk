@@ -1,7 +1,7 @@
 import { IoIosSearch } from 'react-icons/io';
 import DataTable from '../table/DataTable';
 import { FaFileExport } from 'react-icons/fa6';
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { FaArrowRight, FaArrowLeft } from 'react-icons/fa6';
 import columns from './columns';
@@ -12,10 +12,21 @@ export default function DataTableContainer() {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState<string>('');
-  const queryOptions = useCandidatesQueryOptions(currentPage, pageSize);
+  const [debouncedSearch, setDebouncedSearch] = useState<string>('');
+
+  const queryOptions = useCandidatesQueryOptions(currentPage, pageSize, debouncedSearch);
   const { isLoading, data, isFetching } = useQuery(queryOptions);
   const { recordCount = 0, pageCount = 0 } = data?.meta ?? {};
   const candidates = data?.candidates;
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCurrentPage(1);
+      setDebouncedSearch(search);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const handleNext = () => {
     setCurrentPage((prev) => prev + 1);
@@ -24,23 +35,6 @@ export default function DataTableContainer() {
   const handlePrev = () => {
     setCurrentPage((prev) => prev - 1);
   };
-
-  const filteredCandidates = useMemo(() => {
-    if (!search.trim()) return candidates;
-
-    return candidates?.filter((candidate: Candidate) => {
-      const searchLower = search.toLowerCase();
-      return [
-        candidate.first_name,
-        candidate.last_name,
-        candidate.email,
-        candidate.candidate_id?.toString(),
-        candidate.job_application_id?.toString()
-      ]
-        .filter(Boolean)
-        .some((field) => field.toLowerCase().includes(searchLower));
-    });
-  }, [candidates, search]);
 
   return (
     <div className='mt-8 md:mt-12 '>
@@ -74,7 +68,7 @@ export default function DataTableContainer() {
         <div className='w-full'>
           <DataTable
             columns={columns}
-            data={filteredCandidates as Candidate[]}
+            data={candidates as Candidate[]}
             loading={isLoading}
             pageSize={pageSize}
           />
@@ -85,6 +79,7 @@ export default function DataTableContainer() {
         <div className='flex  items-center'>
           <select
             value={pageSize}
+            aria-label='Rows per page'
             onChange={(e) => {
               setPageSize(Number(e.target.value));
               setCurrentPage(1);
@@ -109,6 +104,7 @@ export default function DataTableContainer() {
           {currentPage > 1 && !isLoading && (
             <button
               onClick={handlePrev}
+              aria-label='Previous page'
               disabled={isFetching}
               className='cursor-pointer hover:text-primary-accent ease-in-out duration-300 bg-transparent border-none'
             >
@@ -120,6 +116,7 @@ export default function DataTableContainer() {
             <button
               onClick={handleNext}
               disabled={isFetching}
+              aria-label='Next page '
               className='cursor-pointer hover:text-primary-accent ease-in-out duration-300 bg-transparent border-none'
             >
               <FaArrowRight className='size-4' />
