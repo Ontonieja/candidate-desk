@@ -52,26 +52,3 @@ export async function fetchPaginatedCandidates(
     throw err;
   }
 }
-
-export async function getSearchedCandidates(
-  search: string,
-  candidates: FilteredCandidate[]
-): Promise<FilteredCandidate[]> {
-  try {
-    const filteredCandidates = candidates.filter(
-      ({ first_name, last_name, email, candidate_id, job_application_id }) => {
-        return (
-          first_name?.toLowerCase().includes(search) ||
-          last_name?.toLowerCase().includes(search) ||
-          email?.toLowerCase().includes(search) ||
-          candidate_id?.toString().includes(search) ||
-          job_application_id?.toString().includes(search)
-        );
-      }
-    );
-
-    return filteredCandidates;
-  } catch (err) {
-    throw err;
-  }
-}
